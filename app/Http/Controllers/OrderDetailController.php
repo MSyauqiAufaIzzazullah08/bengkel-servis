@@ -46,7 +46,7 @@ class OrderDetailController extends Controller
             'harga' => $request->harga,
         ]);
 
-        return redirect('/orderdetail');
+        return redirect('/orderdetail')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -81,7 +81,7 @@ class OrderDetailController extends Controller
             'harga' => $request->harga,
         ]);
 
-        return redirect('/orderdetail');
+        return redirect('/orderdetail')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -90,6 +90,6 @@ class OrderDetailController extends Controller
 
         $orderDetail->delete();
 
-        return redirect('/orderdetail');
+        return redirect('/orderdetail')->with('success', 'Data berhasil dihapus.');
     }
 }

@@ -33,7 +33,7 @@ class EkspedisiController extends Controller
             'kontak' => $request->kontak,
         ]);
 
-        return redirect('/ekspedisi');
+        return redirect('/ekspedisi')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -57,7 +57,7 @@ class EkspedisiController extends Controller
             'kontak' => $request->kontak,
         ]);
 
-        return redirect('/ekspedisi');
+        return redirect('/ekspedisi')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -66,6 +66,6 @@ class EkspedisiController extends Controller
 
         $ekspedisi->delete();
 
-        return redirect('/ekspedisi');
+        return redirect('/ekspedisi')->with('success', 'Data berhasil dihapus.');
     }
 }

@@ -52,7 +52,7 @@ class PengirimanController extends Controller
             'tanggal_kirim' => $request->tanggal_kirim,
         ]);
 
-        return redirect('/pengiriman');
+        return redirect('/pengiriman')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -93,7 +93,7 @@ class PengirimanController extends Controller
             'tanggal_kirim' => $request->tanggal_kirim,
         ]);
 
-        return redirect('/pengiriman');
+        return redirect('/pengiriman')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -102,6 +102,6 @@ class PengirimanController extends Controller
 
         $pengiriman->delete();
 
-        return redirect('/pengiriman');
+        return redirect('/pengiriman')->with('success', 'Data berhasil dihapus.');
     }
 }

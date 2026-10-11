@@ -45,7 +45,7 @@ class SparePartController extends Controller
             'gambar' => $request->gambar,
         ]);
 
-        return redirect('/sparepart');
+        return redirect('/sparepart')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -81,7 +81,7 @@ class SparePartController extends Controller
             'gambar' => $request->gambar,
         ]);
 
-        return redirect('/sparepart');
+        return redirect('/sparepart')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -90,6 +90,6 @@ class SparePartController extends Controller
 
         $sparePart->delete();
 
-        return redirect('/sparepart');
+        return redirect('/sparepart')->with('success', 'Data berhasil dihapus.');
     }
 }

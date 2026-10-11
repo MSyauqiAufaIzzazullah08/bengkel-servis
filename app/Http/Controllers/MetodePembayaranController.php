@@ -31,7 +31,7 @@ class MetodePembayaranController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect('/metodepembayaran');
+        return redirect('/metodepembayaran')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -55,7 +55,7 @@ class MetodePembayaranController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect('/metodepembayaran');
+        return redirect('/metodepembayaran')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -64,6 +64,6 @@ class MetodePembayaranController extends Controller
 
         $metode->delete();
 
-        return redirect('/metodepembayaran');
+        return redirect('/metodepembayaran')->with('success', 'Data berhasil dihapus.');
     }
 }

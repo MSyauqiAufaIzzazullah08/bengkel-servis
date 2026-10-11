@@ -56,7 +56,7 @@ class HomeServisController extends Controller
             'catatan' => $request->catatan,
         ]);
 
-        return redirect('/homeservice');
+        return redirect('/homeservice')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -99,7 +99,7 @@ class HomeServisController extends Controller
             'catatan' => $request->catatan,
         ]);
 
-        return redirect('/homeservice');
+        return redirect('/homeservice')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -108,6 +108,6 @@ class HomeServisController extends Controller
 
         $homeServis->delete();
 
-        return redirect('/homeservice');
+        return redirect('/homeservice')->with('success', 'Data berhasil dihapus.');
     }
 }

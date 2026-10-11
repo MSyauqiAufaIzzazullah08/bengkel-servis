@@ -47,7 +47,7 @@ class MontirLapanganController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect('/montirlapangan');
+        return redirect('/montirlapangan')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -86,7 +86,7 @@ class MontirLapanganController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect('/montirlapangan');
+        return redirect('/montirlapangan')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -95,6 +95,6 @@ class MontirLapanganController extends Controller
 
         $montir->delete();
 
-        return redirect('/montirlapangan');
+        return redirect('/montirlapangan')->with('success', 'Data berhasil dihapus.');
     }
 }

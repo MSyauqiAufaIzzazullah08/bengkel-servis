@@ -40,7 +40,7 @@ class LayananServisController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect('/layanan');
+        return redirect('/layanan')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -70,7 +70,7 @@ class LayananServisController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect('/layanan');
+        return redirect('/layanan')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -79,6 +79,6 @@ class LayananServisController extends Controller
 
         $layanan->delete();
 
-        return redirect('/layanan');
+        return redirect('/layanan')->with('success', 'Data berhasil dihapus.');
     }
 }

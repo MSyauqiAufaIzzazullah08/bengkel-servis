@@ -54,7 +54,7 @@ class RatingController extends Controller
             'tanggal' => $request->tanggal,
         ]);
 
-        return redirect('/rating');
+        return redirect('/rating')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -95,7 +95,7 @@ class RatingController extends Controller
             'tanggal' => $request->tanggal,
         ]);
 
-        return redirect('/rating');
+        return redirect('/rating')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -104,6 +104,6 @@ class RatingController extends Controller
 
         $rating->delete();
 
-        return redirect('/rating');
+        return redirect('/rating')->with('success', 'Data berhasil dihapus.');
     }
 }

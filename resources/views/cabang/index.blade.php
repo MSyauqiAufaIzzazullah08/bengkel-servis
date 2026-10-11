@@ -1,159 +1,130 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Data Cabang</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>🏢 DATA CABANG</h1>
+@section('title', 'Cabang')
+
+@section('breadcrumb')
+    <span>Manajemen Cabang</span>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <span class="breadcrumb-current">Cabang</span>
+@endsection
+
+@section('content')
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Manajemen Cabang</h1>
+            <p class="page-subtitle">Data cabang yang terdaftar</p>
+        </div>
+        <a href="/cabang/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tambah Cabang
+        </a>
+    </div>
 
     @if (session('success'))
-        <p style="color: green;">
-            {{ session('success') }}
-        </p>
-    @endif
-
-    @if ($errors->any())
-        <div style="color: red;">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
+        <div class="alert alert-success" style="margin-bottom:20px">
+            <i class="fas fa-check-circle alert-icon"></i>
+            <div>{{ session('success') }}</div>
         </div>
     @endif
 
-    <p>
-        <a href="/cabang/create">
-            ➕ Tambah Cabang
-        </a>
-    </p>
+    @if ($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:20px">
+            <i class="fas fa-times-circle alert-icon"></i>
+            <div>
+                <div class="alert-title">Terjadi kesalahan:</div>
+                <ul style="margin:4px 0 0 16px;padding:0">
+                    @foreach ($errors->all() as $error)
+                        <li style="font-size:0.875rem">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
-    <hr>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-building" style="color:var(--color-accent);margin-right:6px"></i>
+                Daftar Cabang
+                <span class="badge badge-primary" style="margin-left:8px;font-size:0.75rem">
+                    {{ $cabang->count() }} data
+                </span>
+            </h3>
+        </div>
 
-    <h2>Jumlah Cabang: {{ $cabang->count() }}</h2>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nama Cabang</th>
+                        <th>Alamat</th>
+                        <th>Jam Operasional</th>
+                        <th>Kontak</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($cabang as $index => $item)
+                        <tr>
+                            <td>
+                                <span style="color:var(--color-text-muted);font-size:0.8rem">
+                                    {{ $index + 1 }}
+                                </span>
+                            </td>
+                            <td>
+                                <div style="font-weight:600;font-size:0.875rem">{{ $item->nama_cabang }}</div>
+                                <div style="font-size:0.72rem;color:var(--color-text-muted)">
+                                    ID: {{ $item->id_cabang }}
+                                </div>
+                            </td>
+                            <td style="font-size:0.84rem;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
+                                title="{{ $item->alamat }}">
+                                {{ $item->alamat ?? '-' }}
+                            </td>
+                            <td style="font-size:0.84rem">{{ $item->jam_operasional ?? '-' }}</td>
+                            <td style="font-size:0.84rem">{{ $item->kontak ?? '-' }}</td>
+                            <td>
+                                <div class="actions-cell">
+                                    <a href="/cabang/{{ $item->id_cabang }}/edit"
+                                       class="btn btn-accent btn-sm btn-icon"
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="/cabang/{{ $item->id_cabang }}"
+                                          method="POST"
+                                          style="display:inline"
+                                          onsubmit="return confirm('Hapus cabang {{ addslashes($item->nama_cabang) }}? Tindakan ini tidak dapat dibatalkan.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm btn-icon"
+                                                title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6">
+                                <div class="table-empty">
+                                    <i class="fas fa-building"></i>
+                                    <p>Belum ada data cabang.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-    @foreach ($cabang as $item)
+        <div class="card-footer">
+            <span class="text-xs text-muted">
+                Menampilkan {{ $cabang->count() }} cabang dari database
+            </span>
+        </div>
+    </div>
 
-        <hr>
-
-        <h2>🏢 Cabang #{{ $item->id_cabang }}</h2>
-
-        <p>
-            <strong>Nama Cabang:</strong>
-            {{ $item->nama_cabang }}
-        </p>
-
-        <p>
-            <strong>Alamat:</strong>
-            {{ $item->alamat }}
-        </p>
-
-        <p>
-            <strong>Jam Operasional:</strong>
-            {{ $item->jam_operasional }}
-        </p>
-
-        <p>
-            <strong>Kontak:</strong>
-            {{ $item->kontak }}
-        </p>
-
-        <h3>📅 Booking Servis</h3>
-
-        <p>
-            Jumlah Booking:
-            {{ $item->bookingServis->count() }}
-        </p>
-
-        <h3>👤 Admin Cabang</h3>
-
-        @if ($item->adminCabang->count())
-
-            @foreach ($item->adminCabang as $admin)
-
-                <p>
-                    {{ $admin->user->nama ?? 'User tidak tersedia' }}
-                </p>
-
-            @endforeach
-
-        @else
-
-            <p>Belum ada admin cabang.</p>
-
-        @endif
-
-        <h3>📊 Operasional</h3>
-
-        @if ($item->operasionalCabang->count())
-
-            @foreach ($item->operasionalCabang as $operasional)
-
-                <p>
-                    <strong>Total Booking:</strong>
-                    {{ $operasional->total_booking }}
-                </p>
-
-                <p>
-                    <strong>Total Transaksi:</strong>
-                    {{ $operasional->total_transaksi }}
-                </p>
-
-                <p>
-                    <strong>Pendapatan:</strong>
-                    Rp {{ number_format($operasional->pendapatan, 0, ',', '.') }}
-                </p>
-
-                <p>
-                    <strong>Stok:</strong>
-                    {{ $operasional->stok }}
-                </p>
-
-            @endforeach
-
-        @else
-
-            <p>Data operasional belum tersedia.</p>
-
-        @endif
-
-        <h3>🔧 Penugasan Teknisi</h3>
-
-        <p>
-            Jumlah Penugasan:
-            {{ $item->penugasanTeknisi->count() }}
-        </p>
-
-        <h3>👥 User Cabang</h3>
-
-        <p>
-            Jumlah User:
-            {{ $item->users->count() }}
-        </p>
-
-        <p>
-            <a href="/cabang/{{ $item->id_cabang }}/edit">
-                ✏️ Edit
-            </a>
-        </p>
-
-        <form
-            action="/cabang/{{ $item->id_cabang }}"
-            method="POST"
-        >
-            @csrf
-            @method('DELETE')
-
-            <button
-                type="submit"
-                onclick="return confirm('Yakin ingin menghapus cabang ini?')"
-            >
-                🗑️ Hapus
-            </button>
-        </form>
-
-    @endforeach
-
-</body>
-</html>
+@endsection

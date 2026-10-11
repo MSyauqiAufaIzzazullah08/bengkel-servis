@@ -62,7 +62,7 @@ class PembayaranController extends Controller
             'bukti_pembayaran' => $request->bukti_pembayaran,
         ]);
 
-        return redirect('/pembayaran');
+        return redirect('/pembayaran')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -109,7 +109,7 @@ class PembayaranController extends Controller
             'bukti_pembayaran' => $request->bukti_pembayaran,
         ]);
 
-        return redirect('/pembayaran');
+        return redirect('/pembayaran')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -118,6 +118,6 @@ class PembayaranController extends Controller
 
         $pembayaran->delete();
 
-        return redirect('/pembayaran');
+        return redirect('/pembayaran')->with('success', 'Data berhasil dihapus.');
     }
 }

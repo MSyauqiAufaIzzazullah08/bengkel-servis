@@ -33,7 +33,7 @@ class KategoriSparePartController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect('/kategori-sparepart');
+        return redirect('/kategori-sparepart')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -57,7 +57,7 @@ class KategoriSparePartController extends Controller
             'deskripsi' => $request->deskripsi,
         ]);
 
-        return redirect('/kategori-sparepart');
+        return redirect('/kategori-sparepart')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -66,6 +66,6 @@ class KategoriSparePartController extends Controller
 
         $kategori->delete();
 
-        return redirect('/kategori-sparepart');
+        return redirect('/kategori-sparepart')->with('success', 'Data berhasil dihapus.');
     }
 }

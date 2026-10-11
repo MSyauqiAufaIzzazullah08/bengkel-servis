@@ -41,7 +41,7 @@ class PromoController extends Controller
             'kuota' => $request->kuota,
         ]);
 
-        return redirect('/promo');
+        return redirect('/promo')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -75,7 +75,7 @@ class PromoController extends Controller
             'kuota' => $request->kuota,
         ]);
 
-        return redirect('/promo');
+        return redirect('/promo')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -84,6 +84,6 @@ class PromoController extends Controller
 
         $promo->delete();
 
-        return redirect('/promo');
+        return redirect('/promo')->with('success', 'Data berhasil dihapus.');
     }
 }

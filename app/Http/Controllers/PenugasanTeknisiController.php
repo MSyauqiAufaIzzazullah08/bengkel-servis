@@ -53,7 +53,7 @@ class PenugasanTeknisiController extends Controller
             'catatan' => $request->catatan,
         ]);
 
-        return redirect('/penugasan');
+        return redirect('/penugasan')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -94,7 +94,7 @@ class PenugasanTeknisiController extends Controller
             'catatan' => $request->catatan,
         ]);
 
-        return redirect('/penugasan');
+        return redirect('/penugasan')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -103,6 +103,6 @@ class PenugasanTeknisiController extends Controller
 
         $penugasan->delete();
 
-        return redirect('/penugasan');
+        return redirect('/penugasan')->with('success', 'Data berhasil dihapus.');
     }
 }

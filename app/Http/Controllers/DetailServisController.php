@@ -58,7 +58,7 @@ class DetailServisController extends Controller
             'catatan' => $request->catatan,
         ]);
 
-        return redirect('/detailservis');
+        return redirect('/detailservis')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -102,7 +102,7 @@ class DetailServisController extends Controller
             'catatan' => $request->catatan,
         ]);
 
-        return redirect('/detailservis');
+        return redirect('/detailservis')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -111,6 +111,6 @@ class DetailServisController extends Controller
 
         $detail->delete();
 
-        return redirect('/detailservis');
+        return redirect('/detailservis')->with('success', 'Data berhasil dihapus.');
     }
 }

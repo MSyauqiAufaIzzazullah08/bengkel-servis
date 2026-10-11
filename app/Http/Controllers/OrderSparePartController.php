@@ -46,7 +46,7 @@ class OrderSparePartController extends Controller
             'alamat_pengiriman' => $request->alamat_pengiriman,
         ]);
 
-        return redirect('/order');
+        return redirect('/order')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -81,7 +81,7 @@ class OrderSparePartController extends Controller
             'alamat_pengiriman' => $request->alamat_pengiriman,
         ]);
 
-        return redirect('/order');
+        return redirect('/order')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -90,6 +90,6 @@ class OrderSparePartController extends Controller
 
         $order->delete();
 
-        return redirect('/order');
+        return redirect('/order')->with('success', 'Data berhasil dihapus.');
     }
 }

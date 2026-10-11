@@ -65,7 +65,7 @@ class BookingServisController extends Controller
             'catatan' => $request->catatan,
         ]);
 
-        return redirect('/booking');
+        return redirect('/booking')->with('success', 'Data berhasil disimpan.');
     }
 
     public function edit($id)
@@ -115,7 +115,7 @@ class BookingServisController extends Controller
             'catatan' => $request->catatan,
         ]);
 
-        return redirect('/booking');
+        return redirect('/booking')->with('success', 'Data berhasil diubah.');
     }
 
     public function destroy($id)
@@ -124,6 +124,6 @@ class BookingServisController extends Controller
 
         $booking->delete();
 
-        return redirect('/booking');
+        return redirect('/booking')->with('success', 'Data berhasil dihapus.');
     }
 }
