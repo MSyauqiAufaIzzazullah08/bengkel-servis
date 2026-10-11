@@ -310,3 +310,8 @@ Route::middleware('role:1,4,5')->group(function () {
     Route::get('/penugasan/lihat', [PenugasanTeknisiController::class, 'index']);
 
 });
+
+// sementara
+Route::get('/', function () {
+    return redirect('/login');
+});
