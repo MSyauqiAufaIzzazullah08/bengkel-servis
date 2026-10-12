@@ -1,0 +1,48 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Integrasikan halaman yang bergantung pada Data Master dari FEAT-001: kendaraan (FK pelanggan), sparepart (FK kategori), user (FK role+cabang) termasuk membuat edit.blade.php baru, teknisi (FK user), montirlapangan (FK user), promo (tanpa FK), admincabang (FK user+cabang), operasional (FK cabang). FEAT-002 tidak boleh dimulai sebelum FEAT-001 selesai karena mengandalkan pola dan controller fixes yang sudah diterapkan.",
+  "status": "completed",
+  "steps": [
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\kendaraan\\index.blade.php ke @extends. Variabel: $kendaraan. Kolom: #, Pemilik ($item->pelanggan->nama), Merk, Model, Tahun, No Polisi ($item->nopol), Booking ($item->bookingServis->count()), Aksi. Link tambah: /kendaraan/create.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\kendaraan\\create.blade.php ke @extends. Variabel: $pelanggan. Fields: id_pelanggan (select dari $pelanggan, id_pelanggan, nama), merk (text), model (text), tahun (number, min=1900 max=2100), nopol (text). Action: POST /kendaraan.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\kendaraan\\edit.blade.php ke @extends. Variabel: $kendaraan, $pelanggan. Action: PUT /kendaraan/{$kendaraan->id_kendaraan}. Semua field pre-filled dengan old() fallback $kendaraan->field.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\sparepart\\index.blade.php ke @extends. Variabel: $spareParts. Kolom: #, Nama, Kategori ($item->kategori->nama_kategori ?? '-'), Harga (Rp format), Stok, Aksi.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\sparepart\\create.blade.php ke @extends. Variabel: $kategori. Fields: kategori_id (select dari $kategori, id_kategori, nama_kategori), nama (text), harga (number), stok (number), deskripsi (textarea nullable), gambar (text nullable). Action: POST /sparepart.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\sparepart\\edit.blade.php ke @extends. Variabel: $sparePart, $kategori. Action: PUT /sparepart/{$sparePart->id_sparepart}.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\user\\index.blade.php ke @extends. Variabel: $user. Kolom: #, Nama, Email, No HP, Role ($item->role->nama_role ?? '-'), Cabang ($item->cabang->nama_cabang ?? 'Semua'), Status (badge), Aksi.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\user\\create.blade.php ke @extends. Variabel: $roles, $cabang. Fields: nama (text), email (email), password (password, required di create), no_hp (text), alamat (text), role_id (select dari $roles, id_role, nama_role), cabang_id (select dari $cabang nullable + opsi '-- Semua Cabang --'), status (select: aktif/nonaktif). Action: POST /user.",
+    "BUAT BARU D:\\Project\\bengkel-servis\\resources\\views\\user\\edit.blade.php — file ini belum ada. Controller UserController::edit() sudah ada dan mengirim $user, $roles, $cabang. Fields sama dengan create, password nullable (kosong = tidak ubah), pre-filled dengan old() fallback $user->field. Action: PUT /user/{$user->id_user}.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\role\\index.blade.php sudah dilakukan di FEAT-001. Lanjut ke teknisi.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\teknisi\\index.blade.php ke @extends. Variabel: $teknisi. Kolom: #, Nama, No HP, Keahlian, User Akun ($item->user->nama ?? '-'), Status (badge: aktif/tidak aktif), Aksi.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\teknisi\\create.blade.php ke @extends. Variabel: $users (User role_id=4). Fields: user_id (select dari $users, id_user, nama), nama (text), no_hp (text), keahlian (text), status (select: aktif/tidak aktif). Action: POST /teknisi.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\teknisi\\edit.blade.php ke @extends. Variabel: $teknisi, $users. Action: PUT /teknisi/{$teknisi->id_teknisi}.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\montirlapangan\\index.blade.php ke @extends. Variabel: $montir. Kolom: #, Nama, No HP, Area Tugas, User Akun ($item->user->nama ?? '-'), Status (badge), Aksi.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\montirlapangan\\create.blade.php ke @extends. Variabel: $users. Fields: user_id (select dari $users menampilkan nama + role: $item->nama.' ('.$item->role->nama_role.')'), nama (text), no_hp (text), area_tugas (text), status (select: aktif/tidak aktif). Action: POST /montirlapangan.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\montirlapangan\\edit.blade.php ke @extends. Variabel: $montir, $users. Action: PUT /montirlapangan/{$montir->id_montir}.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\promo\\index.blade.php ke @extends. Variabel: $promo. Kolom: #, Kode Promo, Jenis Diskon, Nilai Diskon, Minimal Transaksi, Periode (mulai s.d. selesai), Kuota, Aksi.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\promo\\create.blade.php ke @extends. Fields: kode_promo (text), jenis_diskon (select: persen/nominal), nilai_diskon (number), minimal_transaksi (number), periode_mulai (date), periode_selesai (date), kuota (number integer). Action: POST /promo.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\promo\\edit.blade.php ke @extends. Variabel: $promo. Action: PUT /promo/{$promo->id_promo}.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\admincabang\\index.blade.php ke @extends. Variabel: $adminCabang. Kolom: #, User ($item->user->nama ?? '-'), Email ($item->user->email ?? '-'), Cabang ($item->cabang->nama_cabang ?? '-'), Aksi.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\admincabang\\create.blade.php ke @extends. Variabel: $users, $cabang. Fields: user_id (select dari $users, id_user, nama), cabang_id (select dari $cabang, id_cabang, nama_cabang). Action: POST /admincabang.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\admincabang\\edit.blade.php ke @extends. Variabel: $adminCabang, $users, $cabang. Action: PUT /admincabang/{$adminCabang->id_admin}.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\operasional\\index.blade.php ke @extends. Variabel: $operasional. Kolom: #, Cabang ($item->cabang->nama_cabang ?? '-'), Total Booking, Total Transaksi, Pendapatan (Rp format), Stok, Aksi.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\operasional\\create.blade.php ke @extends. Variabel: $cabang. Fields: cabang_id (select dari $cabang), total_booking (number), total_transaksi (number), pendapatan (number), stok (number), laporan (textarea nullable). Action: POST /operasional.",
+    "Convert D:\\Project\\bengkel-servis\\resources\\views\\operasional\\edit.blade.php ke @extends. Variabel: $operasional, $cabang. Action: PUT /operasional/{$operasional->id_operasional}."
+  ],
+  "acceptance_criteria": [
+    "File D:\\Project\\bengkel-servis\\resources\\views\\user\\edit.blade.php ada (dibuat baru).",
+    "Semua 25 file Blade dalam langkah di atas menggunakan @extends('layouts.app').",
+    "Halaman kendaraan/create menampilkan dropdown pelanggan dari $pelanggan (bukan hardcoded).",
+    "Halaman sparepart/create menampilkan dropdown kategori dari $kategori.",
+    "Halaman user/create dan user/edit menampilkan dropdown role dari $roles dan cabang dari $cabang.",
+    "php artisan view:cache selesai tanpa error setelah semua file diubah."
+  ],
+  "verification": [
+    "cd D:\\Project\\bengkel-servis && php artisan view:cache",
+    "cd D:\\Project\\bengkel-servis && php artisan view:clear",
+    "cd D:\\Project\\bengkel-servis && php artisan route:list"
+  ],
+  "blocked_reason": null,
+  "findings": "COMPLETED. 25 Blade views converted/created using @extends('layouts.app') pattern. Files changed: kendaraan/index.blade.php, kendaraan/create.blade.php, kendaraan/edit.blade.php (dropdown pelanggan dari $pelanggan), sparepart/index.blade.php, sparepart/create.blade.php (dropdown kategori dari $kategori), sparepart/edit.blade.php, user/index.blade.php, user/create.blade.php (dropdown roles+cabang), user/edit.blade.php (CREATED NEW — file belum ada sebelumnya, dropdown roles+cabang, password nullable), teknisi/index.blade.php, teknisi/create.blade.php, teknisi/edit.blade.php, montirlapangan/index.blade.php, montirlapangan/create.blade.php, montirlapangan/edit.blade.php, promo/index.blade.php, promo/create.blade.php, promo/edit.blade.php, admincabang/index.blade.php, admincabang/create.blade.php, admincabang/edit.blade.php, operasional/index.blade.php, operasional/create.blade.php, operasional/edit.blade.php. Verification: php artisan view:cache = SUCCESS (Blade templates cached successfully, exit 0), php artisan view:clear = SUCCESS (Compiled views cleared successfully, exit 0), php artisan route:list = SUCCESS (154 routes, exit 0). Git commit: 4ea9106 on main branch (24 files changed, 2828 insertions, 2435 deletions, 1 new file user/edit.blade.php)."
+}
