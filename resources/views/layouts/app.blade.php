@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 {{--
     resources/views/layouts/app.blade.php
-    Layout utama BengkelServis — desain Kiro (navy-beige).
+    Layout utama BengkelServis — desain navy-beige.
+
+    Variabel $namaUser, $inisial, $namaRole disediakan oleh
+    View::composer di AppServiceProvider (membaca dari session).
+    $pathAktif dihitung di @php block di dalam sidebar.
 
     Cara pakai di halaman child:
         @extends('layouts.app')
         @section('title', 'Judul Halaman')
         @section('breadcrumb') ... @endsection   (opsional)
         @section('content') ... @endsection
-        @section('scripts') ... @endsection      (opsional, JS tambahan)
-
-    Variabel yang tersedia di semua halaman (dari sesi Laravel):
-        $namaUser, $inisial, $namaRole  — dihitung di @php bawah
+        @section('scripts') ... @endsection      (opsional)
 --}}
 <html lang="id">
 <head>
@@ -28,31 +29,10 @@
 </head>
 <body>
 
-@php
-    $namaUser = session('user_nama', 'Pengguna');
-    $roleId   = session('role_id', 0);
-    $namaRole = match((int) $roleId) {
-        1 => 'Super Admin',
-        2 => 'Admin Cabang',
-        3 => 'Petugas Servis',
-        4 => 'Teknisi',
-        5 => 'Montir Lapangan',
-        default => 'Pengguna'
-    };
-    $bagian  = explode(' ', trim($namaUser));
-    $inisial = strtoupper(substr($bagian[0], 0, 1) . (isset($bagian[1]) ? substr($bagian[1], 0, 1) : ''));
-
-    // Tentukan halaman aktif berdasarkan URL saat ini
-    // Dipakai untuk menyorot menu sidebar yang sedang aktif
-    $pathAktif = request()->path(); // contoh: "pelanggan", "booking", dst
-@endphp
-
 <div class="app-wrapper" id="app">
 
     {{-- ============================================================
          SIDEBAR
-         Semua link menuju route Laravel yang terdaftar di web.php.
-         Logout menggunakan POST + @csrf sesuai LoginController.
          ============================================================ --}}
     <aside class="sidebar" id="sidebar">
 
@@ -65,6 +45,12 @@
                 <span class="sidebar-brand-subtitle">Multi-Cabang</span>
             </div>
         </div>
+
+        @php
+            // pathAktif disediakan oleh View::composer di AppServiceProvider
+            // Fallback jika diakses di luar konteks yang normal
+            $pathAktif = $pathAktif ?? request()->path();
+        @endphp
 
         <nav class="sidebar-nav" id="sidebarNav">
 
@@ -339,10 +325,10 @@
 
                 <div class="dropdown">
                     <div class="user-menu" data-dropdown="userDropdown">
-                        <div class="user-avatar">{{ $inisial }}</div>
+                        <div class="user-avatar">{{ $inisial ?? '?' }}</div>
                         <div class="user-info">
-                            <span class="user-name">{{ $namaUser }}</span>
-                            <span class="user-role">{{ $namaRole }}</span>
+                            <span class="user-name">{{ $namaUser ?? 'Pengguna' }}</span>
+                            <span class="user-role">{{ $namaRole ?? '' }}</span>
                         </div>
                         <i class="fas fa-chevron-down"
                            style="font-size:0.7rem;color:var(--color-text-muted);margin-left:4px"></i>
@@ -378,15 +364,15 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
-{{-- JavaScript Kiro --}}
 <script src="{{ asset('assets/js/data.js') }}"></script>
 <script src="{{ asset('assets/js/app.js') }}"></script>
 <script>
-    // Notifikasi bell
     var btnNotif = document.getElementById('btnNotif');
     if (btnNotif) {
         btnNotif.addEventListener('click', function() {
-            showToast('Belum ada notifikasi baru.', 'info');
+            if (typeof showToast === 'function') {
+                showToast('Belum ada notifikasi baru.', 'info');
+            }
         });
     }
 </script>
