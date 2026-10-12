@@ -37,6 +37,10 @@ class LoginController extends Controller
             'role_id' => $user->role_id,
         ]);
 
+        if ((int) $user->role_id === 6) {
+            return redirect('/dashboard-pelanggan');
+        }
+
         return redirect('/dashboard');
     }
 
