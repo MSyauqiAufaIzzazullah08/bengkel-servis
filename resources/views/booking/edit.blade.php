@@ -1,183 +1,146 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Booking Servis</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>✏️ EDIT BOOKING SERVIS</h1>
+@section('title', 'Edit Booking Servis')
 
-    <hr>
+@section('breadcrumb')
+    <span>Transaksi</span>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <a href="/booking" style="color:inherit;text-decoration:none">Booking Servis</a>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <span class="breadcrumb-current">Edit</span>
+@endsection
 
-    <form
-        action="/booking/{{ $booking->id_booking }}"
-        method="POST"
-    >
+@section('content')
 
-        @csrf
-        @method('PUT')
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Edit Booking Servis</h1>
+            <p class="page-subtitle">Ubah data booking #{{ $booking->id_booking }}</p>
+        </div>
+        <a href="/booking" class="btn btn-accent">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
 
-        <p>
-            <label>
-                <strong>Pelanggan</strong>
-            </label>
-            <br>
+    @if ($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:20px">
+            <i class="fas fa-times-circle alert-icon"></i>
+            <div>
+                <div class="alert-title">Terjadi kesalahan:</div>
+                <ul style="margin:4px 0 0 16px;padding:0">
+                    @foreach ($errors->all() as $error)
+                        <li style="font-size:0.875rem">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
-            <select name="id_pelanggan" required>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-edit" style="color:var(--color-accent);margin-right:6px"></i>
+                Form Edit Booking
+            </h3>
+        </div>
+        <div style="padding:24px">
+            <form action="/booking/{{ $booking->id_booking }}" method="POST">
+                @csrf
+                @method('PUT')
 
-                @foreach ($pelanggan as $item)
+                <div class="form-group">
+                    <label class="form-label" for="id_pelanggan">Pelanggan <span style="color:red">*</span></label>
+                    <select name="id_pelanggan" id="id_pelanggan" class="form-control" required>
+                        <option value="">-- Pilih Pelanggan --</option>
+                        @foreach ($pelanggan as $item)
+                            <option value="{{ $item->id_pelanggan }}"
+                                {{ old('id_pelanggan', $booking->id_pelanggan) == $item->id_pelanggan ? 'selected' : '' }}>
+                                {{ $item->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                    <option
-                        value="{{ $item->id_pelanggan }}"
-                        {{ $booking->id_pelanggan == $item->id_pelanggan ? 'selected' : '' }}
-                    >
-                        {{ $item->nama }}
-                    </option>
+                <div class="form-group">
+                    <label class="form-label" for="id_kendaraan">Kendaraan <span style="color:red">*</span></label>
+                    <select name="id_kendaraan" id="id_kendaraan" class="form-control" required>
+                        <option value="">-- Pilih Kendaraan --</option>
+                        @foreach ($kendaraan as $item)
+                            <option value="{{ $item->id_kendaraan }}"
+                                {{ old('id_kendaraan', $booking->id_kendaraan) == $item->id_kendaraan ? 'selected' : '' }}>
+                                {{ $item->merk }} {{ $item->model }} - {{ $item->nopol }}
+                                ({{ $item->pelanggan->nama ?? '-' }})
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                @endforeach
+                <div class="form-group">
+                    <label class="form-label" for="id_cabang">Cabang <span style="color:red">*</span></label>
+                    <select name="id_cabang" id="id_cabang" class="form-control" required>
+                        <option value="">-- Pilih Cabang --</option>
+                        @foreach ($cabang as $item)
+                            <option value="{{ $item->id_cabang }}"
+                                {{ old('id_cabang', $booking->id_cabang) == $item->id_cabang ? 'selected' : '' }}>
+                                {{ $item->nama_cabang }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-            </select>
-        </p>
+                <div class="form-group">
+                    <label class="form-label" for="layanan_id">Layanan Servis <span style="color:red">*</span></label>
+                    <select name="layanan_id" id="layanan_id" class="form-control" required>
+                        <option value="">-- Pilih Layanan --</option>
+                        @foreach ($layanan as $item)
+                            <option value="{{ $item->id_layanan }}"
+                                {{ old('layanan_id', $booking->layanan_id) == $item->id_layanan ? 'selected' : '' }}>
+                                {{ $item->nama_layanan }} - Rp {{ number_format($item->harga, 0, ',', '.') }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-        <p>
-            <label>
-                <strong>Kendaraan</strong>
-            </label>
-            <br>
+                <div class="form-group">
+                    <label class="form-label" for="tanggal_booking">Tanggal Booking <span style="color:red">*</span></label>
+                    <input type="date" name="tanggal_booking" id="tanggal_booking" class="form-control"
+                           value="{{ old('tanggal_booking', $booking->tanggal_booking) }}" required>
+                </div>
 
-            <select name="id_kendaraan" required>
+                <div class="form-group">
+                    <label class="form-label" for="waktu_booking">Waktu Booking <span style="color:red">*</span></label>
+                    <input type="time" name="waktu_booking" id="waktu_booking" class="form-control"
+                           value="{{ old('waktu_booking', $booking->waktu_booking) }}" required>
+                </div>
 
-                @foreach ($kendaraan as $item)
+                <div class="form-group">
+                    <label class="form-label" for="status">Status <span style="color:red">*</span></label>
+                    <select name="status" id="status" class="form-control" required>
+                        <option value="">-- Pilih Status --</option>
+                        @foreach (['menunggu', 'diproses', 'selesai', 'dibatalkan'] as $s)
+                            <option value="{{ $s }}"
+                                {{ old('status', $booking->status) == $s ? 'selected' : '' }}>
+                                {{ ucfirst($s) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                    <option
-                        value="{{ $item->id_kendaraan }}"
-                        {{ $booking->id_kendaraan == $item->id_kendaraan ? 'selected' : '' }}
-                    >
-                        {{ $item->merk }}
-                        {{ $item->model }}
-                        -
-                        {{ $item->nopol }}
-                        -
-                        {{ $item->pelanggan->nama ?? '-' }}
-                    </option>
+                <div class="form-group">
+                    <label class="form-label" for="catatan">Catatan</label>
+                    <textarea name="catatan" id="catatan" class="form-control" rows="3">{{ old('catatan', $booking->catatan) }}</textarea>
+                </div>
 
-                @endforeach
+                <div style="display:flex;gap:12px;margin-top:8px">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update
+                    </button>
+                    <a href="/booking" class="btn btn-accent">
+                        <i class="fas fa-times"></i> Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            </select>
-        </p>
-
-        <p>
-            <label>
-                <strong>Cabang</strong>
-            </label>
-            <br>
-
-            <select name="id_cabang" required>
-
-                @foreach ($cabang as $item)
-
-                    <option
-                        value="{{ $item->id_cabang }}"
-                        {{ $booking->id_cabang == $item->id_cabang ? 'selected' : '' }}
-                    >
-                        {{ $item->nama_cabang }}
-                    </option>
-
-                @endforeach
-
-            </select>
-        </p>
-
-        <p>
-            <label>
-                <strong>Layanan Servis</strong>
-            </label>
-            <br>
-
-            <select name="layanan_id" required>
-
-                @foreach ($layanan as $item)
-
-                    <option
-                        value="{{ $item->id_layanan }}"
-                        {{ $booking->layanan_id == $item->id_layanan ? 'selected' : '' }}
-                    >
-                        {{ $item->nama_layanan }}
-                        -
-                        Rp {{ number_format($item->harga, 0, ',', '.') }}
-                    </option>
-
-                @endforeach
-
-            </select>
-        </p>
-
-        <p>
-            <label>
-                <strong>Tanggal Booking</strong>
-            </label>
-            <br>
-
-            <input
-                type="date"
-                name="tanggal_booking"
-                value="{{ $booking->tanggal_booking }}"
-                required
-            >
-        </p>
-
-        <p>
-            <label>
-                <strong>Waktu Booking</strong>
-            </label>
-            <br>
-
-            <input
-                type="time"
-                name="waktu_booking"
-                value="{{ $booking->waktu_booking }}"
-                required
-            >
-        </p>
-
-        <p>
-            <label>
-                <strong>Status</strong>
-            </label>
-            <br>
-
-            <input
-                type="text"
-                name="status"
-                value="{{ $booking->status }}"
-                required
-            >
-        </p>
-
-        <p>
-            <label>
-                <strong>Catatan</strong>
-            </label>
-            <br>
-
-            <textarea
-                name="catatan"
-                rows="4"
-                cols="50"
-            >{{ $booking->catatan }}</textarea>
-        </p>
-
-        <button type="submit">
-            💾 Update
-        </button>
-
-    </form>
-
-    <br>
-
-    <a href="/booking">
-        ← Kembali
-    </a>
-
-</body>
-</html>
+@endsection

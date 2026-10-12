@@ -1,107 +1,175 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Data Penugasan Teknisi</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>🔧 DATA PENUGASAN TEKNISI</h1>
+@section('title', 'Penugasan Teknisi')
 
-    <p>
-        <a href="/penugasan/create">
-            ➕ Tambah Penugasan
+@section('breadcrumb')
+    <span>Transaksi</span>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <span class="breadcrumb-current">Penugasan Teknisi</span>
+@endsection
+
+@section('content')
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Manajemen Penugasan Teknisi</h1>
+            <p class="page-subtitle">Data penugasan teknisi untuk booking servis</p>
+        </div>
+        <a href="/penugasan/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tambah Penugasan
         </a>
-    </p>
+    </div>
 
-    <hr>
+    @if (session('success'))
+        <div class="alert alert-success" style="margin-bottom:20px">
+            <i class="fas fa-check-circle alert-icon"></i>
+            <div>{{ session('success') }}</div>
+        </div>
+    @endif
 
-    <h2>
-        Jumlah Data Penugasan: {{ $penugasan->count() }}
-    </h2>
+    @if ($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:20px">
+            <i class="fas fa-times-circle alert-icon"></i>
+            <div>
+                <div class="alert-title">Terjadi kesalahan:</div>
+                <ul style="margin:4px 0 0 16px;padding:0">
+                    @foreach ($errors->all() as $error)
+                        <li style="font-size:0.875rem">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
-    @foreach ($penugasan as $item)
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-user-cog" style="color:var(--color-accent);margin-right:6px"></i>
+                Daftar Penugasan Teknisi
+                <span class="badge badge-primary" style="margin-left:8px;font-size:0.75rem">
+                    {{ $penugasan->count() }} data
+                </span>
+            </h3>
+            <div class="search-input-wrapper" style="max-width:280px">
+                <i class="fas fa-search"></i>
+                <input type="text" id="cariPenugasan" class="search-input"
+                       placeholder="Cari booking, teknisi...">
+            </div>
+        </div>
 
-        <hr>
+        <div class="table-container">
+            <table class="table" id="tabelPenugasan">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Booking</th>
+                        <th>Kendaraan</th>
+                        <th>Teknisi</th>
+                        <th>Tanggal</th>
+                        <th>Status</th>
+                        <th>Catatan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($penugasan as $index => $item)
+                        <tr>
+                            <td>
+                                <span style="color:var(--color-text-muted);font-size:0.8rem">
+                                    {{ $index + 1 }}
+                                </span>
+                            </td>
+                            <td style="font-size:0.84rem">
+                                <div style="font-weight:600">#{{ $item->id_penugasan }}</div>
+                                <div style="font-size:0.75rem;color:var(--color-text-muted)">
+                                    {{ $item->bookingServis->pelanggan->nama ?? '-' }}
+                                </div>
+                            </td>
+                            <td style="font-size:0.84rem">
+                                {{ $item->bookingServis->kendaraan->merk ?? '-' }}
+                            </td>
+                            <td style="font-size:0.875rem;font-weight:600">
+                                {{ $item->teknisi->nama ?? '-' }}
+                            </td>
+                            <td style="font-size:0.8rem;color:var(--color-text-muted)">
+                                {{ $item->tanggal
+                                    ? \Carbon\Carbon::parse($item->tanggal)->format('d M Y')
+                                    : '-' }}
+                            </td>
+                            <td>
+                                @php
+                                    $statusClass = match($item->status) {
+                                        'ditugaskan'        => 'badge-warning',
+                                        'sedang dikerjakan' => 'badge-info',
+                                        'selesai'           => 'badge-success',
+                                        default             => 'badge-secondary',
+                                    };
+                                @endphp
+                                <span class="badge {{ $statusClass }}">
+                                    {{ ucfirst($item->status ?? '-') }}
+                                </span>
+                            </td>
+                            <td style="font-size:0.8rem;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
+                                title="{{ $item->catatan }}">
+                                {{ $item->catatan ?? '-' }}
+                            </td>
+                            <td>
+                                <div class="actions-cell">
+                                    <a href="/penugasan/{{ $item->id_penugasan }}/edit"
+                                       class="btn btn-accent btn-sm btn-icon"
+                                       title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="/penugasan/{{ $item->id_penugasan }}"
+                                          method="POST"
+                                          style="display:inline"
+                                          onsubmit="return confirm('Hapus penugasan ini? Tindakan ini tidak dapat dibatalkan.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="btn btn-danger btn-sm btn-icon"
+                                                title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8">
+                                <div class="table-empty">
+                                    <i class="fas fa-user-cog"></i>
+                                    <p>Belum ada data penugasan teknisi.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-        <h2>
-            🔧 Penugasan #{{ $item->id_penugasan }}
-        </h2>
+        <div class="card-footer d-flex justify-between align-center">
+            <span class="text-xs text-muted">
+                Menampilkan {{ $penugasan->count() }} penugasan dari database
+            </span>
+        </div>
+    </div>
 
-        <h3>📋 Booking Servis</h3>
+@endsection
 
-        <p>
-            <strong>ID Booking:</strong>
-            {{ $item->bookingServis->id_booking ?? '-' }}
-        </p>
-
-        <p>
-            <strong>Pelanggan:</strong>
-            {{ $item->bookingServis->pelanggan->nama ?? '-' }}
-        </p>
-
-        <p>
-            <strong>Kendaraan:</strong>
-            {{ $item->bookingServis->kendaraan->merk ?? '-' }}
-            {{ $item->bookingServis->kendaraan->model ?? '' }}
-        </p>
-
-        <p>
-            <strong>Nopol:</strong>
-            {{ $item->bookingServis->kendaraan->nopol ?? '-' }}
-        </p>
-
-        <h3>👨‍🔧 Teknisi</h3>
-
-        <p>
-            <strong>Nama:</strong>
-            {{ $item->teknisi->nama ?? '-' }}
-        </p>
-
-        <p>
-            <strong>Keahlian:</strong>
-            {{ $item->teknisi->keahlian ?? '-' }}
-        </p>
-
-        <h3>📅 Tanggal</h3>
-
-        <p>
-            {{ $item->tanggal }}
-        </p>
-
-        <h3>📌 Status</h3>
-
-        <p>
-            <strong>{{ $item->status }}</strong>
-        </p>
-
-        <h3>📝 Catatan</h3>
-
-        <p>
-            {{ $item->catatan ?? '-' }}
-        </p>
-
-        <p>
-
-            <a href="/penugasan/{{ $item->id_penugasan }}/edit">
-                ✏️ Edit
-            </a>
-
-            <form
-                action="/penugasan/{{ $item->id_penugasan }}"
-                method="POST"
-                style="display:inline;"
-            >
-                @csrf
-                @method('DELETE')
-
-                <button type="submit">
-                    🗑️ Hapus
-                </button>
-            </form>
-
-        </p>
-
-    @endforeach
-
-</body>
-</html>
+@section('scripts')
+<script>
+    var inputCari = document.getElementById('cariPenugasan');
+    if (inputCari) {
+        inputCari.addEventListener('input', function () {
+            var q = this.value.toLowerCase();
+            var baris = document.querySelectorAll('#tabelPenugasan tbody tr');
+            baris.forEach(function (tr) {
+                var teks = tr.textContent.toLowerCase();
+                tr.style.display = teks.includes(q) ? '' : 'none';
+            });
+        });
+    }
+</script>
+@endsection

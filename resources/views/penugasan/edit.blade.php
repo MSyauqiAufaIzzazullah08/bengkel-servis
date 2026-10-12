@@ -1,136 +1,113 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Edit Penugasan Teknisi</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>✏️ EDIT PENUGASAN TEKNISI</h1>
+@section('title', 'Edit Penugasan Teknisi')
 
-    <hr>
+@section('breadcrumb')
+    <span>Transaksi</span>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <a href="/penugasan" style="color:inherit;text-decoration:none">Penugasan Teknisi</a>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <span class="breadcrumb-current">Edit</span>
+@endsection
 
-    <form
-        action="/penugasan/{{ $penugasan->id_penugasan }}"
-        method="POST"
-    >
+@section('content')
 
-        @csrf
-        @method('PUT')
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Edit Penugasan Teknisi</h1>
+            <p class="page-subtitle">Ubah data penugasan #{{ $penugasan->id_penugasan }}</p>
+        </div>
+        <a href="/penugasan" class="btn btn-accent">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
 
-        <p>
-            <label>
-                <strong>Booking Servis</strong>
-            </label>
-            <br>
+    @if ($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:20px">
+            <i class="fas fa-times-circle alert-icon"></i>
+            <div>
+                <div class="alert-title">Terjadi kesalahan:</div>
+                <ul style="margin:4px 0 0 16px;padding:0">
+                    @foreach ($errors->all() as $error)
+                        <li style="font-size:0.875rem">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
-            <select name="id_booking" required>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-edit" style="color:var(--color-accent);margin-right:6px"></i>
+                Form Edit Penugasan
+            </h3>
+        </div>
+        <div style="padding:24px">
+            <form action="/penugasan/{{ $penugasan->id_penugasan }}" method="POST">
+                @csrf
+                @method('PUT')
 
-                @foreach ($booking as $item)
+                <div class="form-group">
+                    <label class="form-label" for="id_booking">Booking Servis <span style="color:red">*</span></label>
+                    <select name="id_booking" id="id_booking" class="form-control" required>
+                        <option value="">-- Pilih Booking --</option>
+                        @foreach ($booking as $item)
+                            <option value="{{ $item->id_booking }}"
+                                {{ old('id_booking', $penugasan->id_booking) == $item->id_booking ? 'selected' : '' }}>
+                                #{{ $item->id_booking }} - {{ $item->pelanggan->nama ?? '-' }} - {{ $item->kendaraan->merk ?? '-' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                    <option
-                        value="{{ $item->id_booking }}"
-                        {{ $penugasan->id_booking == $item->id_booking ? 'selected' : '' }}
-                    >
+                <div class="form-group">
+                    <label class="form-label" for="id_teknisi">Teknisi <span style="color:red">*</span></label>
+                    <select name="id_teknisi" id="id_teknisi" class="form-control" required>
+                        <option value="">-- Pilih Teknisi --</option>
+                        @foreach ($teknisi as $item)
+                            <option value="{{ $item->id_teknisi }}"
+                                {{ old('id_teknisi', $penugasan->id_teknisi) == $item->id_teknisi ? 'selected' : '' }}>
+                                {{ $item->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                        Booking #{{ $item->id_booking }}
+                <div class="form-group">
+                    <label class="form-label" for="tanggal">Tanggal <span style="color:red">*</span></label>
+                    <input type="date" name="tanggal" id="tanggal" class="form-control"
+                           value="{{ old('tanggal', $penugasan->tanggal) }}" required>
+                </div>
 
-                        -
-                        {{ $item->pelanggan->nama ?? '-' }}
+                <div class="form-group">
+                    <label class="form-label" for="status">Status <span style="color:red">*</span></label>
+                    <select name="status" id="status" class="form-control" required>
+                        <option value="">-- Pilih Status --</option>
+                        @foreach (['ditugaskan', 'sedang dikerjakan', 'selesai'] as $s)
+                            <option value="{{ $s }}"
+                                {{ old('status', $penugasan->status) == $s ? 'selected' : '' }}>
+                                {{ ucfirst($s) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                        -
+                <div class="form-group">
+                    <label class="form-label" for="catatan">Catatan</label>
+                    <textarea name="catatan" id="catatan" class="form-control" rows="3">{{ old('catatan', $penugasan->catatan) }}</textarea>
+                </div>
 
-                        {{ $item->kendaraan->merk ?? '-' }}
-                        {{ $item->kendaraan->model ?? '' }}
+                <div style="display:flex;gap:12px;margin-top:8px">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update
+                    </button>
+                    <a href="/penugasan" class="btn btn-accent">
+                        <i class="fas fa-times"></i> Batal
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                        -
-                        {{ $item->kendaraan->nopol ?? '-' }}
-
-                    </option>
-
-                @endforeach
-
-            </select>
-        </p>
-
-        <p>
-            <label>
-                <strong>Teknisi</strong>
-            </label>
-            <br>
-
-            <select name="id_teknisi" required>
-
-                @foreach ($teknisi as $item)
-
-                    <option
-                        value="{{ $item->id_teknisi }}"
-                        {{ $penugasan->id_teknisi == $item->id_teknisi ? 'selected' : '' }}
-                    >
-
-                        {{ $item->nama }}
-
-                        -
-                        {{ $item->keahlian }}
-
-                    </option>
-
-                @endforeach
-
-            </select>
-        </p>
-
-        <p>
-            <label>
-                <strong>Tanggal</strong>
-            </label>
-            <br>
-
-            <input
-                type="date"
-                name="tanggal"
-                value="{{ $penugasan->tanggal }}"
-                required
-            >
-        </p>
-
-        <p>
-            <label>
-                <strong>Status</strong>
-            </label>
-            <br>
-
-            <input
-                type="text"
-                name="status"
-                value="{{ $penugasan->status }}"
-                required
-            >
-        </p>
-
-        <p>
-            <label>
-                <strong>Catatan</strong>
-            </label>
-            <br>
-
-            <textarea
-                name="catatan"
-                rows="4"
-                cols="50"
-            >{{ $penugasan->catatan }}</textarea>
-        </p>
-
-        <button type="submit">
-            💾 Update
-        </button>
-
-    </form>
-
-    <br>
-
-    <a href="/penugasan">
-        ← Kembali
-    </a>
-
-</body>
-</html>
+@endsection
