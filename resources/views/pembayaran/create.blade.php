@@ -1,161 +1,144 @@
-<h1>➕ Tambah Pembayaran</h1>
+@extends('layouts.app')
 
-<form action="/pembayaran" method="POST">
+@section('title', 'Tambah Pembayaran')
 
-    @csrf
+@section('breadcrumb')
+    <span>Keuangan</span>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <a href="/pembayaran">Daftar Pembayaran</a>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <span class="breadcrumb-current">Tambah</span>
+@endsection
 
-    <p>
-        <label>Booking Servis:</label><br>
+@section('content')
 
-        <select name="id_booking">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Tambah Pembayaran</h1>
+            <p class="page-subtitle">Isi form berikut untuk mencatat pembayaran baru</p>
+        </div>
+        <a href="/pembayaran" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
 
-            <option value="">
-                -- Tidak menggunakan Booking --
-            </option>
+    @if ($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:20px">
+            <i class="fas fa-times-circle alert-icon"></i>
+            <div>
+                <div class="alert-title">Terjadi kesalahan:</div>
+                <ul style="margin:4px 0 0 16px;padding:0">
+                    @foreach ($errors->all() as $error)
+                        <li style="font-size:0.875rem">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
-            @foreach ($booking as $item)
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-credit-card" style="color:var(--color-accent);margin-right:6px"></i> Form Pembayaran</h3>
+        </div>
+        <div class="card-body">
+            <form action="/pembayaran" method="POST">
+                @csrf
 
-                <option value="{{ $item->id_booking }}">
-                    Booking #{{ $item->id_booking }}
-                    -
-                    {{ $item->pelanggan->nama ?? 'Tanpa Pelanggan' }}
-                </option>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Booking Servis <small style="color:var(--color-text-muted)">(opsional)</small></label>
+                        <select name="id_booking" class="form-control">
+                            <option value="">-- Pilih Booking (jika ada) --</option>
+                            @foreach ($booking as $b)
+                                <option value="{{ $b->id_booking }}"
+                                    {{ old('id_booking') == $b->id_booking ? 'selected' : '' }}>
+                                    #{{ $b->id_booking }} — {{ $b->pelanggan->nama ?? '-' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Order Spare Part <small style="color:var(--color-text-muted)">(opsional)</small></label>
+                        <select name="id_order" class="form-control">
+                            <option value="">-- Pilih Order (jika ada) --</option>
+                            @foreach ($orders as $o)
+                                <option value="{{ $o->id_order }}"
+                                    {{ old('id_order') == $o->id_order ? 'selected' : '' }}>
+                                    #{{ $o->id_order }} — {{ $o->pelanggan->nama ?? '-' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-            @endforeach
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Metode Pembayaran <span style="color:red">*</span></label>
+                        <select name="metode_pembayaran_id" class="form-control" required>
+                            <option value="">-- Pilih Metode --</option>
+                            @foreach ($metode as $m)
+                                <option value="{{ $m->id_metode }}"
+                                    {{ old('metode_pembayaran_id') == $m->id_metode ? 'selected' : '' }}>
+                                    {{ $m->nama_metode }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Promo <small style="color:var(--color-text-muted)">(opsional)</small></label>
+                        <select name="id_promo" class="form-control">
+                            <option value="">-- Tanpa Promo --</option>
+                            @foreach ($promo as $p)
+                                <option value="{{ $p->id_promo }}"
+                                    {{ old('id_promo') == $p->id_promo ? 'selected' : '' }}>
+                                    {{ $p->kode_promo }} — {{ $p->nama_promo ?? '' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-        </select>
-    </p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Jumlah Bayar (Rp) <span style="color:red">*</span></label>
+                        <input type="number" name="jumlah" class="form-control"
+                               value="{{ old('jumlah') }}" min="0" step="0.01"
+                               placeholder="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status <span style="color:red">*</span></label>
+                        <select name="status" class="form-control" required>
+                            <option value="">-- Pilih Status --</option>
+                            @foreach (['menunggu','lunas','gagal'] as $s)
+                                <option value="{{ $s }}" {{ old('status') == $s ? 'selected' : '' }}>
+                                    {{ ucfirst($s) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-    <p>
-        <label>Order Spare Part:</label><br>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tanggal Bayar</label>
+                        <input type="date" name="tanggal_bayar" class="form-control"
+                               value="{{ old('tanggal_bayar') }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Bukti Pembayaran <small style="color:var(--color-text-muted)">(URL/nomor referensi)</small></label>
+                        <input type="text" name="bukti_pembayaran" class="form-control"
+                               value="{{ old('bukti_pembayaran') }}" placeholder="Opsional">
+                    </div>
+                </div>
 
-        <select name="id_order">
+                <div style="display:flex;gap:12px;margin-top:8px">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                    <a href="/pembayaran" class="btn btn-secondary">Batal</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <option value="">
-                -- Tidak menggunakan Order --
-            </option>
-
-            @foreach ($orders as $order)
-
-                <option value="{{ $order->id_order }}">
-                    Order #{{ $order->id_order }}
-                    -
-                    {{ $order->pelanggan->nama ?? 'Tanpa Pelanggan' }}
-                </option>
-
-            @endforeach
-
-        </select>
-    </p>
-
-    <p>
-        <label>Promo:</label><br>
-
-        <select name="id_promo">
-
-            <option value="">
-                -- Tidak menggunakan Promo --
-            </option>
-
-            @foreach ($promo as $item)
-
-                <option value="{{ $item->id_promo }}">
-                    {{ $item->kode_promo }}
-                    -
-                    {{ $item->jenis_diskon }}
-                </option>
-
-            @endforeach
-
-        </select>
-    </p>
-
-    <p>
-        <label>Metode Pembayaran:</label><br>
-
-        <select name="metode_pembayaran_id" required>
-
-            <option value="">
-                -- Pilih Metode --
-            </option>
-
-            @foreach ($metode as $item)
-
-                <option value="{{ $item->id_metode }}">
-                    {{ $item->nama_metode }}
-                </option>
-
-            @endforeach
-
-        </select>
-    </p>
-
-    <p>
-        <label>Jumlah:</label><br>
-
-        <input
-            type="number"
-            name="jumlah"
-            min="0"
-            required
-        >
-    </p>
-
-    <p>
-        <label>Status:</label><br>
-
-        <select name="status" required>
-
-            <option value="">
-                -- Pilih Status --
-            </option>
-
-            <option value="Pending">
-                Pending
-            </option>
-
-            <option value="Paid">
-                Paid
-            </option>
-
-            <option value="Failed">
-                Failed
-            </option>
-
-            <option value="Cancelled">
-                Cancelled
-            </option>
-
-        </select>
-    </p>
-
-    <p>
-        <label>Tanggal Bayar:</label><br>
-
-        <input
-            type="datetime-local"
-            name="tanggal_bayar"
-        >
-    </p>
-
-    <p>
-        <label>Bukti Pembayaran:</label><br>
-
-        <input
-            type="text"
-            name="bukti_pembayaran"
-            placeholder="contoh: transfer-001.jpg"
-        >
-    </p>
-
-    <button type="submit">
-        💾 Simpan
-    </button>
-
-</form>
-
-<br>
-
-<a href="/pembayaran">
-    ⬅️ Kembali
-</a>
+@endsection

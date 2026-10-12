@@ -1,114 +1,122 @@
-<h1>➕ Tambah Rating</h1>
+@extends('layouts.app')
 
-<form action="/rating" method="POST">
+@section('title', 'Tambah Rating')
 
-    @csrf
+@section('breadcrumb')
+    <span>Ulasan</span>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <a href="/rating">Rating & Ulasan</a>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <span class="breadcrumb-current">Tambah</span>
+@endsection
 
-    <p>
-        <label>Pelanggan:</label><br>
+@section('content')
 
-        <select name="id_pelanggan" required>
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Tambah Rating & Ulasan</h1>
+            <p class="page-subtitle">Catat penilaian pelanggan</p>
+        </div>
+        <a href="/rating" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
 
-            <option value="">
-                -- Pilih Pelanggan --
-            </option>
+    @if ($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:20px">
+            <i class="fas fa-times-circle alert-icon"></i>
+            <div>
+                <div class="alert-title">Terjadi kesalahan:</div>
+                <ul style="margin:4px 0 0 16px;padding:0">
+                    @foreach ($errors->all() as $error)
+                        <li style="font-size:0.875rem">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
-            @foreach ($pelanggan as $item)
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-star" style="color:var(--color-accent);margin-right:6px"></i> Form Rating</h3>
+        </div>
+        <div class="card-body">
+            <form action="/rating" method="POST">
+                @csrf
 
-                <option value="{{ $item->id_pelanggan }}">
-                    {{ $item->nama }}
-                </option>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Pelanggan <span style="color:red">*</span></label>
+                        <select name="id_pelanggan" class="form-control" required>
+                            <option value="">-- Pilih Pelanggan --</option>
+                            @foreach ($pelanggan as $p)
+                                <option value="{{ $p->id_pelanggan }}"
+                                    {{ old('id_pelanggan') == $p->id_pelanggan ? 'selected' : '' }}>
+                                    {{ $p->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nilai (1-5) <span style="color:red">*</span></label>
+                        <select name="nilai" class="form-control" required>
+                            <option value="">-- Pilih Nilai --</option>
+                            @for ($i = 1; $i <= 5; $i++)
+                                <option value="{{ $i }}" {{ old('nilai') == $i ? 'selected' : '' }}>
+                                    {{ $i }} Bintang
+                                </option>
+                            @endfor
+                        </select>
+                    </div>
+                </div>
 
-            @endforeach
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Booking Servis <small style="color:var(--color-text-muted)">(opsional)</small></label>
+                        <select name="id_booking" class="form-control">
+                            <option value="">-- Pilih Booking --</option>
+                            @foreach ($booking as $b)
+                                <option value="{{ $b->id_booking }}"
+                                    {{ old('id_booking') == $b->id_booking ? 'selected' : '' }}>
+                                    #{{ $b->id_booking }} — {{ $b->pelanggan->nama ?? '-' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Order Spare Part <small style="color:var(--color-text-muted)">(opsional)</small></label>
+                        <select name="id_order" class="form-control">
+                            <option value="">-- Pilih Order --</option>
+                            @foreach ($orders as $o)
+                                <option value="{{ $o->id_order }}"
+                                    {{ old('id_order') == $o->id_order ? 'selected' : '' }}>
+                                    #{{ $o->id_order }} — {{ $o->pelanggan->nama ?? '-' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-        </select>
-    </p>
+                <div class="form-group">
+                    <label class="form-label">Ulasan</label>
+                    <textarea name="ulasan" class="form-control" rows="4"
+                              placeholder="Tulis ulasan pelanggan...">{{ old('ulasan') }}</textarea>
+                </div>
 
-    <p>
-        <label>Booking Servis:</label><br>
+                <div class="form-group" style="max-width:320px">
+                    <label class="form-label">Tanggal</label>
+                    <input type="date" name="tanggal" class="form-control"
+                           value="{{ old('tanggal') }}">
+                </div>
 
-        <select name="id_booking">
+                <div style="display:flex;gap:12px;margin-top:8px">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                    <a href="/rating" class="btn btn-secondary">Batal</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <option value="">
-                -- Tidak menggunakan Booking --
-            </option>
-
-            @foreach ($booking as $item)
-
-                <option value="{{ $item->id_booking }}">
-                    Booking #{{ $item->id_booking }}
-                    -
-                    {{ $item->pelanggan->nama ?? 'Tanpa Pelanggan' }}
-                </option>
-
-            @endforeach
-
-        </select>
-    </p>
-
-    <p>
-        <label>Order Spare Part:</label><br>
-
-        <select name="id_order">
-
-            <option value="">
-                -- Tidak menggunakan Order --
-            </option>
-
-            @foreach ($orders as $order)
-
-                <option value="{{ $order->id_order }}">
-                    Order #{{ $order->id_order }}
-                    -
-                    {{ $order->pelanggan->nama ?? 'Tanpa Pelanggan' }}
-                </option>
-
-            @endforeach
-
-        </select>
-    </p>
-
-    <p>
-        <label>Nilai Rating:</label><br>
-
-        <select name="nilai" required>
-
-            <option value="">
-                -- Pilih Nilai --
-            </option>
-
-            <option value="1">⭐ 1</option>
-            <option value="2">⭐⭐ 2</option>
-            <option value="3">⭐⭐⭐ 3</option>
-            <option value="4">⭐⭐⭐⭐ 4</option>
-            <option value="5">⭐⭐⭐⭐⭐ 5</option>
-
-        </select>
-    </p>
-
-    <p>
-        <label>Ulasan:</label><br>
-
-        <textarea name="ulasan"></textarea>
-    </p>
-
-    <p>
-        <label>Tanggal:</label><br>
-
-        <input
-            type="datetime-local"
-            name="tanggal"
-        >
-    </p>
-
-    <button type="submit">
-        💾 Simpan
-    </button>
-
-</form>
-
-<br>
-
-<a href="/rating">
-    ⬅️ Kembali
-</a>
+@endsection

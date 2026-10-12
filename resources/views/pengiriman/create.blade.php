@@ -1,129 +1,122 @@
-<h1>➕ Tambah Pengiriman</h1>
+@extends('layouts.app')
 
-<form action="/pengiriman" method="POST">
+@section('title', 'Tambah Pengiriman')
 
-    @csrf
+@section('breadcrumb')
+    <span>Pengiriman</span>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <a href="/pengiriman">Daftar Pengiriman</a>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <span class="breadcrumb-current">Tambah</span>
+@endsection
 
-    <p>
-        <label>Order:</label><br>
+@section('content')
 
-        <select name="id_order" required>
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Tambah Pengiriman</h1>
+            <p class="page-subtitle">Isi form berikut untuk menambah data pengiriman</p>
+        </div>
+        <a href="/pengiriman" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
 
-            <option value="">
-                -- Pilih Order --
-            </option>
+    @if ($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:20px">
+            <i class="fas fa-times-circle alert-icon"></i>
+            <div>
+                <div class="alert-title">Terjadi kesalahan:</div>
+                <ul style="margin:4px 0 0 16px;padding:0">
+                    @foreach ($errors->all() as $error)
+                        <li style="font-size:0.875rem">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
-            @foreach ($orders as $order)
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-truck" style="color:var(--color-accent);margin-right:6px"></i> Form Pengiriman</h3>
+        </div>
+        <div class="card-body">
+            <form action="/pengiriman" method="POST">
+                @csrf
 
-                <option value="{{ $order->id_order }}">
-                    Order #{{ $order->id_order }}
-                    -
-                    {{ $order->pelanggan->nama ?? 'Tanpa Pelanggan' }}
-                </option>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Order Spare Part <span style="color:red">*</span></label>
+                        <select name="id_order" class="form-control" required>
+                            <option value="">-- Pilih Order --</option>
+                            @foreach ($orders as $order)
+                                <option value="{{ $order->id_order }}"
+                                    {{ old('id_order') == $order->id_order ? 'selected' : '' }}>
+                                    Order #{{ $order->id_order }} — {{ $order->pelanggan->nama ?? '-' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ekspedisi <span style="color:red">*</span></label>
+                        <select name="id_ekspedisi" class="form-control" required>
+                            <option value="">-- Pilih Ekspedisi --</option>
+                            @foreach ($ekspedisi as $eks)
+                                <option value="{{ $eks->id_ekspedisi }}"
+                                    {{ old('id_ekspedisi') == $eks->id_ekspedisi ? 'selected' : '' }}>
+                                    {{ $eks->nama_ekspedisi }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-            @endforeach
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Kurir <span style="color:red">*</span></label>
+                        <input type="text" name="kurir" class="form-control"
+                               value="{{ old('kurir') }}" placeholder="Nama kurir" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nomor Resi <span style="color:red">*</span></label>
+                        <input type="text" name="no_resi" class="form-control"
+                               value="{{ old('no_resi') }}" placeholder="Nomor resi pengiriman" required>
+                    </div>
+                </div>
 
-        </select>
-    </p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Status <span style="color:red">*</span></label>
+                        <select name="status" class="form-control" required>
+                            <option value="">-- Pilih Status --</option>
+                            @foreach (['pending','dikirim','tiba'] as $s)
+                                <option value="{{ $s }}" {{ old('status') == $s ? 'selected' : '' }}>
+                                    {{ ucfirst($s) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tanggal Kirim</label>
+                        <input type="date" name="tanggal_kirim" class="form-control"
+                               value="{{ old('tanggal_kirim') }}">
+                    </div>
+                </div>
 
-    <p>
-        <label>Ekspedisi:</label><br>
+                <div class="form-group" style="max-width:320px">
+                    <label class="form-label">Estimasi Tiba</label>
+                    <input type="date" name="estimasi_tiba" class="form-control"
+                           value="{{ old('estimasi_tiba') }}">
+                </div>
 
-        <select name="id_ekspedisi" required>
+                <div style="display:flex;gap:12px;margin-top:8px">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                    <a href="/pengiriman" class="btn btn-secondary">Batal</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-            <option value="">
-                -- Pilih Ekspedisi --
-            </option>
-
-            @foreach ($ekspedisi as $item)
-
-                <option value="{{ $item->id_ekspedisi }}">
-                    {{ $item->nama_ekspedisi }}
-                </option>
-
-            @endforeach
-
-        </select>
-    </p>
-
-    <p>
-        <label>Kurir:</label><br>
-
-        <input
-            type="text"
-            name="kurir"
-            required
-        >
-    </p>
-
-    <p>
-        <label>No. Resi:</label><br>
-
-        <input
-            type="text"
-            name="no_resi"
-            required
-        >
-    </p>
-
-    <p>
-        <label>Status:</label><br>
-
-        <select name="status" required>
-
-            <option value="">
-                -- Pilih Status --
-            </option>
-
-            <option value="Pending">
-                Pending
-            </option>
-
-            <option value="Shipped">
-                Shipped
-            </option>
-
-            <option value="In Transit">
-                In Transit
-            </option>
-
-            <option value="Delivered">
-                Delivered
-            </option>
-
-            <option value="Cancelled">
-                Cancelled
-            </option>
-
-        </select>
-    </p>
-
-    <p>
-        <label>Estimasi Tiba:</label><br>
-
-        <input
-            type="date"
-            name="estimasi_tiba"
-        >
-    </p>
-
-    <p>
-        <label>Tanggal Kirim:</label><br>
-
-        <input
-            type="datetime-local"
-            name="tanggal_kirim"
-        >
-    </p>
-
-    <button type="submit">
-        💾 Simpan
-    </button>
-
-</form>
-
-<br>
-
-<a href="/pengiriman">
-    ⬅️ Kembali
-</a>
+@endsection

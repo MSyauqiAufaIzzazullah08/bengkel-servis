@@ -1,105 +1,145 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Data Detail Servis</title>
-</head>
-<body>
+@extends('layouts.app')
 
-    <h1>🔧 DATA DETAIL SERVIS</h1>
+@section('title', 'Detail Servis')
 
-    <p>
-        <a href="/detailservis/create">
-            ➕ Tambah Detail Servis
+@section('breadcrumb')
+    <span>Manajemen Servis</span>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <span class="breadcrumb-current">Detail Servis</span>
+@endsection
+
+@section('content')
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Detail Servis</h1>
+            <p class="page-subtitle">Rincian layanan yang digunakan dalam setiap booking</p>
+        </div>
+        <a href="/detailservis/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Tambah Detail
         </a>
-    </p>
+    </div>
 
-    <hr>
+    @if (session('success'))
+        <div class="alert alert-success" style="margin-bottom:20px">
+            <i class="fas fa-check-circle alert-icon"></i>
+            <div>{{ session('success') }}</div>
+        </div>
+    @endif
 
-    <h2>
-        Jumlah Data Detail Servis: {{ $detail->count() }}
-    </h2>
+    @if ($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:20px">
+            <i class="fas fa-times-circle alert-icon"></i>
+            <div>
+                <div class="alert-title">Terjadi kesalahan:</div>
+                <ul style="margin:4px 0 0 16px;padding:0">
+                    @foreach ($errors->all() as $error)
+                        <li style="font-size:0.875rem">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
-    @foreach ($detail as $item)
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-clipboard-list" style="color:var(--color-accent);margin-right:6px"></i>
+                Daftar Detail Servis
+                <span class="badge badge-primary" style="margin-left:8px;font-size:0.75rem">
+                    {{ $detail->count() }} data
+                </span>
+            </h3>
+            <div class="search-input-wrapper" style="max-width:280px">
+                <i class="fas fa-search"></i>
+                <input type="text" id="cariDetail" class="search-input"
+                       placeholder="Cari pelanggan, layanan...">
+            </div>
+        </div>
 
-        <hr>
+        <div class="table-container">
+            <table class="table" id="tabelDetail">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Booking</th>
+                        <th>Layanan</th>
+                        <th>Spare Part</th>
+                        <th>Harga</th>
+                        <th>Catatan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($detail as $index => $item)
+                        <tr>
+                            <td><span style="color:var(--color-text-muted);font-size:0.8rem">{{ $index + 1 }}</span></td>
+                            <td style="font-size:0.84rem">
+                                <div style="font-weight:600">{{ $item->bookingServis->pelanggan->nama ?? '-' }}</div>
+                                <div style="font-size:0.72rem;color:var(--color-text-muted)">
+                                    {{ $item->bookingServis->kendaraan->merk ?? '' }}
+                                    {{ $item->bookingServis->kendaraan->model ?? '' }}
+                                    &bull; Booking #{{ $item->booking_id }}
+                                </div>
+                            </td>
+                            <td style="font-size:0.84rem">{{ $item->layananServis->nama_layanan ?? '-' }}</td>
+                            <td style="font-size:0.82rem">{{ $item->sparePart->nama ?? '-' }}</td>
+                            <td style="font-size:0.85rem;font-weight:600">
+                                Rp {{ number_format($item->harga, 0, ',', '.') }}
+                            </td>
+                            <td style="font-size:0.8rem;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
+                                title="{{ $item->catatan }}">
+                                {{ $item->catatan ?? '-' }}
+                            </td>
+                            <td>
+                                <div class="actions-cell">
+                                    <a href="/detailservis/{{ $item->id_detail }}/edit"
+                                       class="btn btn-accent btn-sm btn-icon" title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="/detailservis/{{ $item->id_detail }}" method="POST"
+                                          style="display:inline"
+                                          onsubmit="return confirm('Hapus detail servis ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7">
+                                <div class="table-empty">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    <p>Belum ada data detail servis.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-        <h2>
-            🔧 Detail Servis #{{ $item->id_detail }}
-        </h2>
+        <div class="card-footer d-flex justify-between align-center">
+            <span class="text-xs text-muted">Menampilkan {{ $detail->count() }} data detail servis</span>
+        </div>
+    </div>
 
-        <h3>📋 Booking Servis</h3>
+@endsection
 
-        <p>
-            <strong>ID Booking:</strong>
-            {{ $item->bookingServis->id_booking ?? '-' }}
-        </p>
-
-        <p>
-            <strong>Pelanggan:</strong>
-            {{ $item->bookingServis->pelanggan->nama ?? '-' }}
-        </p>
-
-        <p>
-            <strong>Kendaraan:</strong>
-            {{ $item->bookingServis->kendaraan->merk ?? '-' }}
-            {{ $item->bookingServis->kendaraan->model ?? '' }}
-        </p>
-
-        <p>
-            <strong>Nopol:</strong>
-            {{ $item->bookingServis->kendaraan->nopol ?? '-' }}
-        </p>
-
-        <h3>🛠️ Layanan Servis</h3>
-
-        <p>
-            <strong>Nama Layanan:</strong>
-            {{ $item->layananServis->nama_layanan ?? '-' }}
-        </p>
-
-        <h3>🔩 Spare Part</h3>
-
-        <p>
-            <strong>Nama:</strong>
-            {{ $item->sparePart->nama ?? '-' }}
-        </p>
-
-        <h3>💰 Harga</h3>
-
-        <p>
-            <strong>
-                Rp {{ number_format($item->harga, 0, ',', '.') }}
-            </strong>
-        </p>
-
-        <h3>📝 Catatan</h3>
-
-        <p>
-            {{ $item->catatan ?? '-' }}
-        </p>
-
-        <p>
-
-            <a href="/detailservis/{{ $item->id_detail }}/edit">
-                ✏️ Edit
-            </a>
-
-            <form
-                action="/detailservis/{{ $item->id_detail }}"
-                method="POST"
-                style="display:inline;"
-            >
-                @csrf
-                @method('DELETE')
-
-                <button type="submit">
-                    🗑️ Hapus
-                </button>
-            </form>
-
-        </p>
-
-    @endforeach
-
-</body>
-</html>
+@section('scripts')
+<script>
+    var inputCari = document.getElementById('cariDetail');
+    if (inputCari) {
+        inputCari.addEventListener('input', function () {
+            var q = this.value.toLowerCase();
+            document.querySelectorAll('#tabelDetail tbody tr').forEach(function (tr) {
+                tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+    }
+</script>
+@endsection

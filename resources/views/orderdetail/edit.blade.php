@@ -1,87 +1,98 @@
-<h1>✏️ Edit Order Detail</h1>
+@extends('layouts.app')
 
-<form
-    action="/orderdetail/{{ $orderDetail->id_detail_order }}"
-    method="POST"
->
+@section('title', 'Edit Detail Pesanan')
 
-    @csrf
-    @method('PUT')
+@section('breadcrumb')
+    <span>Inventaris</span>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <a href="/orderdetail">Detail Pesanan</a>
+    <i class="fas fa-chevron-right" style="font-size:0.65rem"></i>
+    <span class="breadcrumb-current">Edit</span>
+@endsection
 
-    <p>
-        <label>Order:</label><br>
+@section('content')
 
-        <select name="id_order" required>
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Edit Detail Pesanan</h1>
+            <p class="page-subtitle">Ubah detail pesanan #{{ $orderDetail->id_detail_order }}</p>
+        </div>
+        <a href="/orderdetail" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
+    </div>
 
-            @foreach ($orders as $order)
+    @if ($errors->any())
+        <div class="alert alert-danger" style="margin-bottom:20px">
+            <i class="fas fa-times-circle alert-icon"></i>
+            <div>
+                <div class="alert-title">Terjadi kesalahan:</div>
+                <ul style="margin:4px 0 0 16px;padding:0">
+                    @foreach ($errors->all() as $error)
+                        <li style="font-size:0.875rem">{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
 
-                <option
-                    value="{{ $order->id_order }}"
-                    {{ $orderDetail->id_order == $order->id_order ? 'selected' : '' }}
-                >
-                    Order #{{ $order->id_order }}
-                    -
-                    {{ $order->pelanggan->nama ?? 'Tanpa Pelanggan' }}
-                </option>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-list-alt" style="color:var(--color-accent);margin-right:6px"></i> Form Edit Detail Pesanan</h3>
+        </div>
+        <div class="card-body">
+            <form action="/orderdetail/{{ $orderDetail->id_detail_order }}" method="POST">
+                @csrf
+                @method('PUT')
 
-            @endforeach
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Pesanan Spare Part <span style="color:red">*</span></label>
+                        <select name="id_order" class="form-control" required>
+                            <option value="">-- Pilih Pesanan --</option>
+                            @foreach ($orders as $o)
+                                <option value="{{ $o->id_order }}"
+                                    {{ old('id_order', $orderDetail->id_order) == $o->id_order ? 'selected' : '' }}>
+                                    Order #{{ $o->id_order }} — {{ $o->pelanggan->nama ?? '-' }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Spare Part <span style="color:red">*</span></label>
+                        <select name="id_sparepart" class="form-control" required>
+                            <option value="">-- Pilih Spare Part --</option>
+                            @foreach ($spareParts as $s)
+                                <option value="{{ $s->id_sparepart }}"
+                                    {{ old('id_sparepart', $orderDetail->id_sparepart) == $s->id_sparepart ? 'selected' : '' }}>
+                                    {{ $s->nama }} (Stok: {{ $s->stok }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
 
-        </select>
-    </p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Jumlah <span style="color:red">*</span></label>
+                        <input type="number" name="jumlah" class="form-control"
+                               value="{{ old('jumlah', $orderDetail->jumlah) }}" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Harga Satuan (Rp) <span style="color:red">*</span></label>
+                        <input type="number" name="harga" class="form-control"
+                               value="{{ old('harga', $orderDetail->harga) }}" min="0" step="0.01" required>
+                    </div>
+                </div>
 
-    <p>
-        <label>Spare Part:</label><br>
+                <div style="display:flex;gap:12px;margin-top:8px">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Simpan Perubahan
+                    </button>
+                    <a href="/orderdetail" class="btn btn-secondary">Batal</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        <select name="id_sparepart" required>
-
-            @foreach ($spareParts as $sparePart)
-
-                <option
-                    value="{{ $sparePart->id_sparepart }}"
-                    {{ $orderDetail->id_sparepart == $sparePart->id_sparepart ? 'selected' : '' }}
-                >
-                    {{ $sparePart->nama }}
-                    -
-                    Rp {{ number_format($sparePart->harga, 0, ',', '.') }}
-                </option>
-
-            @endforeach
-
-        </select>
-    </p>
-
-    <p>
-        <label>Jumlah:</label><br>
-
-        <input
-            type="number"
-            name="jumlah"
-            min="1"
-            value="{{ $orderDetail->jumlah }}"
-            required
-        >
-    </p>
-
-    <p>
-        <label>Harga:</label><br>
-
-        <input
-            type="number"
-            name="harga"
-            min="0"
-            value="{{ $orderDetail->harga }}"
-            required
-        >
-    </p>
-
-    <button type="submit">
-        💾 Update
-    </button>
-
-</form>
-
-<br>
-
-<a href="/orderdetail">
-    ⬅️ Kembali
-</a>
+@endsection
